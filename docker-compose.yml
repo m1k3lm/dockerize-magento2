@@ -11,7 +11,7 @@ services:
       - ./config/nginx/ssl:/etc/nginx/ssl
       - ./config/nginx/auth:/etc/nginx/auth
     volumes_from:
-      - appdata:ro
+      - php:ro
     depends_on:
       - php
     networks:
@@ -20,30 +20,19 @@ services:
 
 
   php:
-    image: arvato/magento2-php:latest
+    image: m1k3lm/magento2-php-for-osx:latest
     volumes:
       - ./config/php/php.ini:/usr/local/etc/php/php.ini
       - ./config/php/php-fpm.conf:/usr/local/etc/php-fpm.conf
       - ./config/php/ext-xdebug.ini:/usr/local/etc/php/conf.d/ext-xdebug.ini
-    volumes_from:
-      - appdata
+      - .:/var/www/html
     env_file: .env
     depends_on:
-      - appdata
       - mysql
       - cache
     user: www-data
     networks:
       - back
-
-
-  appdata:
-    image: alpine:latest
-    volumes:
-      - ./config/appdata/startup.sh:/startup.sh
-      - .:/var/www/html
-    command: /bin/sh /startup.sh
-
 
   mysql:
     image: mysql:5.7
